@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  name           String
+  email          String   @unique
+  googleSignInId String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Topics {
+  id           Int            @id @default(autoincrement())
+  name         String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  urlShortener UrlShortener[]
+
+  @@index([name], name: "nameIndex")
+  
+}
+
+model CustomAlias {
+  id             Int          @id @default(autoincrement())
+  alias          String       @unique
+  urlShortenerId Int          @unique
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id])
+}
+
+model UrlShortener {
+  id            Int          @id @default(autoincrement())
+  longUrl       String
+  shortUrl      String
+  topics        Topics[]
+  customAliasId Int?
+  customAlias   CustomAlias?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  clicks        Clicks[]
+
+  @@index([shortUrl], name: "shortUrlIndex")
+  @@index([longUrl], name: "longUrlIndex")
+}
+
+model Clicks {
+  id Int @id @default(autoincrement())
+
+  userIp     String
+  userOs     String
+  userDevice String
+
+  urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id])
+  urlShortenerId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([urlShortenerId], name: "urlShortenerIdIndex")
+  @@index([userIp], name: "userIpIndex")
+  @@index([userOs], name: "userOsIndex")
+  @@index([userDevice], name: "userDeviceIndex")
+  @@index([createdAt], name: "createdAtIndex")
+}
