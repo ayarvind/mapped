@@ -15,7 +15,7 @@ app.use(cors({
 
 app.use(helmet());
 app.use(auth);
-app.use(router);
+app.use('/api/v1', router);
 
 app.get('/health', (_, res) => {
     res.status(200).send('OK');

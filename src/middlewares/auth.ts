@@ -4,8 +4,9 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 export default function auth(req: Request, res: Response, next: NextFunction) {
     const unprotectedRoutes = [
-        '/health',
-        '/api/auth'
+        '/api/v1/health',
+        '/',
+        '/api/v1/auth'
     ];
 
     if (unprotectedRoutes.includes(req.path)) {
