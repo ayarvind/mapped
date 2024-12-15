@@ -14,17 +14,21 @@ model User {
   googleSignInId String   @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  UrlShortener UrlShortener[]
+  Topics       Topics[]
 }
 
 model Topics {
   id           Int            @id @default(autoincrement())
   name         String
+  user         User           @relation(fields: [userId], references: [id],onDelete: Cascade)
+  userId       Int
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   urlShortener UrlShortener[]
 
   @@index([name], name: "nameIndex")
-  
 }
 
 model CustomAlias {
@@ -33,22 +37,39 @@ model CustomAlias {
   urlShortenerId Int          @unique
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id])
+  urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id],onDelete: Cascade)
+
 }
 
 model UrlShortener {
-  id            Int          @id @default(autoincrement())
-  longUrl       String
-  shortUrl      String
+  id       Int    @id @default(autoincrement())
+  longUrl  String
+  shortUrl String @unique
+
+  userId        Int
+  user          User         @relation(fields: [userId], references: [id],onDelete: Cascade)
   topics        Topics[]
   customAliasId Int?
   customAlias   CustomAlias?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   clicks        Clicks[]
+  expiration    DateTime?
 
+  @@index([expiration], name: "expirationIndex")
   @@index([shortUrl], name: "shortUrlIndex")
-  @@index([longUrl], name: "longUrlIndex")
+}
+
+model GeoLocation {
+  id Int @id @default(autoincrement())
+
+  latitude  Float
+  longitude Float
+
+  clicks Clicks[]
+
+  @@index([latitude], name: "latitudeIndex")
+  @@index([longitude], name: "longitudeIndex")
 }
 
 model Clicks {
@@ -58,7 +79,10 @@ model Clicks {
   userOs     String
   userDevice String
 
-  urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id])
+  geoLocation   GeoLocation? @relation(fields: [geoLocationid], references: [id],onDelete: SetNull)
+  geoLocationid Int?
+
+  urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id],onDelete: Cascade)
   urlShortenerId Int
 
   createdAt DateTime @default(now())
