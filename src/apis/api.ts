@@ -4,6 +4,7 @@ import { authHandler } from './auth';
 import newTopic from './topics/new-topic';
 import getTopics from './topics/get-topics';
 import newShortner from './short/new-short';
+import redirectToLonUrl from './short/redirect';
 
 const router = express.Router();
 
@@ -16,7 +17,8 @@ router.get('/topics',getTopics)
 
 // shortner
 
-router.post('/short', newShortner)
+router.post('/shorten', newShortner)
+router.get('/shorten/:shortUrl', redirectToLonUrl)
 
 
 

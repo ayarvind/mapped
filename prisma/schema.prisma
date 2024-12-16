@@ -58,17 +58,6 @@ model UrlShortener {
   @@index([expiration], name: "expirationIndex")
 }
 
-model GeoLocation {
-  id Int @id @default(autoincrement())
-
-  latitude  Float
-  longitude Float
-
-  clicks Clicks[]
-
-  @@index([latitude], name: "latitudeIndex")
-  @@index([longitude], name: "longitudeIndex")
-}
 
 model Clicks {
   id Int @id @default(autoincrement())
@@ -76,9 +65,6 @@ model Clicks {
   userIp     String
   userOs     String
   userDevice String
-
-  geoLocation   GeoLocation? @relation(fields: [geoLocationid], references: [id],onDelete: SetNull)
-  geoLocationid Int?
 
   urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id],onDelete: Cascade)
   urlShortenerId Int

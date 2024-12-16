@@ -5,6 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { errorHandler, notFound} from './middlewares/errorHandler';
 import auth from './middlewares/auth';
+import { createTopics } from './kafka/admin';
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,6 +29,7 @@ app.use(errorHandler);
 
 
 app.listen(port, () => {
+    createTopics();
     console.log(`Server is running on port ${port}`);
 })
 
