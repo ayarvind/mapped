@@ -7,7 +7,7 @@ export default interface AuthUser {
 
 export interface AuthResponse {
     message: string;
-    details?: string;
+    details?: string[];
     token?: string;
     user?: {
         id: number;

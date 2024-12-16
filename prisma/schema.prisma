@@ -44,18 +44,17 @@ model CustomAlias {
 model UrlShortener {
   id       Int    @id @default(autoincrement())
   longUrl  String
-  shortUrl String @unique
-
-  userId        Int
-  user          User         @relation(fields: [userId], references: [id],onDelete: Cascade)
+  shortUrl String? @unique
+  userId   Int
+  user          User @relation(fields: [userId], references: [id],onDelete: Cascade)
   topics        Topics[]
-  customAliasId Int?
   customAlias   CustomAlias?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   clicks        Clicks[]
   expiration    DateTime?
-
+  lastAccessed  DateTime?
+  clicksCount   Int @default(0)
   @@index([expiration], name: "expirationIndex")
 }
 
