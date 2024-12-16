@@ -5,6 +5,7 @@ import newTopic from './topics/new-topic';
 import getTopics from './topics/get-topics';
 import newShortner from './short/new-short';
 import redirectToLonUrl from './short/redirect';
+import overall from './analytics/overall';
 
 const router = express.Router();
 
@@ -20,6 +21,8 @@ router.get('/topics',getTopics)
 router.post('/shorten', newShortner)
 router.get('/shorten/:shortUrl', redirectToLonUrl)
 
+//analytics
 
+router.get('/analytics/overall', overall)
 
 export default router;

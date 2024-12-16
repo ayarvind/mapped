@@ -67,13 +67,12 @@ model Clicks {
   userDevice String?
   urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id],onDelete: Cascade)
   urlShortenerId Int
-
-  createdAt DateTime @default(now())
+  timestamp DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([urlShortenerId], name: "urlShortenerIdIndex")
   @@index([userIp], name: "userIpIndex")
   @@index([userOs], name: "userOsIndex")
   @@index([userDevice], name: "userDeviceIndex")
-  @@index([createdAt], name: "createdAtIndex")
+  @@index([timestamp], name: "timestampIndex")
 }
