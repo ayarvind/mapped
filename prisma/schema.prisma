@@ -63,9 +63,8 @@ model Clicks {
   id Int @id @default(autoincrement())
 
   userIp     String
-  userOs     String
-  userDevice String
-
+  userOs     String?
+  userDevice String?
   urlShortener   UrlShortener @relation(fields: [urlShortenerId], references: [id],onDelete: Cascade)
   urlShortenerId Int
 

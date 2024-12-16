@@ -14,6 +14,10 @@ export async function createTopics() {
                 topic: "url-click-event-logs",
                 numPartitions: 2,
             },
+            {
+                topic : "dead-letter-queue-event-logs",
+                numPartitions:2,
+            }
         ],
     });
 
