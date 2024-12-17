@@ -6,10 +6,10 @@ import { subDays, isWithinInterval, format } from 'date-fns';
 export default async function overall(request: Request, response: Response) {
     try {
         // Consolidate total counts and aggregations
-
+      
         const urlStats = await prisma.urlShortener.aggregate({
             where: {
-                userId: request.body.id
+                userId: request.body.user.id
             },
             _count: { id: true },
             _sum: { clicksCount: true, uniqueClicksCount: true },
@@ -31,7 +31,7 @@ export default async function overall(request: Request, response: Response) {
             },
             where: {
                 urlShortener: {
-                    userId: request.body.id
+                    userId: request.body.user.id
                 }
             }
 

@@ -33,6 +33,7 @@ export default function auth(req: Request, res: Response, next: NextFunction) {
         return next(new Error('Access denied. No token provided.'));
     }
 
+
     // Verify JWT token
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
