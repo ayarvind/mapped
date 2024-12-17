@@ -6,9 +6,14 @@ import { subDays, isWithinInterval, format } from 'date-fns';
 export default async function overall(request: Request, response: Response) {
     try {
         // Consolidate total counts and aggregations
+
         const urlStats = await prisma.urlShortener.aggregate({
+            where: {
+                userId: request.body.id
+            },
             _count: { id: true },
             _sum: { clicksCount: true, uniqueClicksCount: true },
+
         });
 
         const totalUrls = urlStats._count.id;
@@ -24,23 +29,29 @@ export default async function overall(request: Request, response: Response) {
                 userIp: true,
                 urlShortenerId: true,
             },
+            where: {
+                urlShortener: {
+                    userId: request.body.id
+                }
+            }
+
         });
 
 
         interface ClickCount {
             totalClicks: number;
-            uniqueClicks: Set<string> ;
+            uniqueClicks: Set<string>;
         }
         const osStats: Record<string, ClickCount> = {};
         const deviceStats: Record<string, ClickCount> = {};
         const clickByDate: Record<string, number> = {};
 
-      
+
 
         const today = new Date();
         const sevenDaysAgo = subDays(today, 7);
 
-        clicksData.forEach(({ timestamp, userOs, userDevice,urlShortenerId }) => {
+        clicksData.forEach(({ timestamp, userOs, userDevice, urlShortenerId }) => {
             // Group OS stats
             const osName = userOs || 'Unknown';
             osStats[osName] = osStats[osName] || {
@@ -49,7 +60,7 @@ export default async function overall(request: Request, response: Response) {
             }
             osStats[osName].totalClicks++;
             osStats[osName].uniqueClicks.add(`${userOs}-${urlShortenerId.toString()}`);
-           
+
 
             // Group device stats
             const deviceName = userDevice || 'Unknown';
@@ -67,11 +78,11 @@ export default async function overall(request: Request, response: Response) {
                 clickByDate[formattedDate] = (clickByDate[formattedDate] || 0) + 1;
             }
         });
-      
+
 
         // Transform results into desired format
-        const osType = Object.entries(osStats).map(([osName, totalClicks]) => ({ 
-            osName, 
+        const osType = Object.entries(osStats).map(([osName, totalClicks]) => ({
+            osName,
             totalClicks: totalClicks.totalClicks,
             uniqueClicks: totalClicks.uniqueClicks.size,
         }));
@@ -79,7 +90,7 @@ export default async function overall(request: Request, response: Response) {
             deviceName,
             totalClicks: totalClicks.totalClicks,
             uniqueClicks: totalClicks.uniqueClicks.size,
-         }));
+        }));
         const clickByDate_ = Object.entries(clickByDate).map(([date, totalClicks]) => ({ date, totalClicks }));
 
         // Final response
