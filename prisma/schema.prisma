@@ -55,6 +55,7 @@ model UrlShortener {
   expiration    DateTime?
   lastAccessed  DateTime?
   clicksCount   Int @default(0)
+  uniqueClicksCount Int @default(0)
   @@index([expiration], name: "expirationIndex")
 }
 

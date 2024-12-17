@@ -1,73 +1,96 @@
 import { OverallAnalytics } from '@/interfaces/response';
 import { prisma } from '../../config/prisma';
 import { Request, Response } from 'express';
+import { subDays, isWithinInterval, format } from 'date-fns';
 
 export default async function overall(request: Request, response: Response) {
     try {
-        const totalUrls = await prisma.urlShortener.count();
-        const { _sum: { clicksCount: totalClicks } } = await prisma.urlShortener.aggregate({
-            _sum: { clicksCount: true },
+        // Consolidate total counts and aggregations
+        const urlStats = await prisma.urlShortener.aggregate({
+            _count: { id: true },
+            _sum: { clicksCount: true, uniqueClicksCount: true },
         });
 
-        // Group data for clicks by date, OS, and device with unique user counts
-        const clickStats = await Promise.all([
-            prisma.clicks.groupBy({
-                by: ['timestamp'],
-                _count: { id: true },
-            }),
-            prisma.clicks.groupBy({
-                by: ['userOs'],
-                _count: { userOs: true },
+        const totalUrls = urlStats._count.id;
+        const totalClicks = urlStats._sum.clicksCount || 0;
+        const uniqueClicks = urlStats._sum.uniqueClicksCount || 0;
 
-            }),
-            prisma.clicks.groupBy({
-                by: ['userDevice'],
-                _count: { userDevice: true },
-            }),
-        ]);
-
-        const [clickByDate, osType, deviceType] = clickStats;
-
-        // Prepare response data
-        const osStats = osType.map(os => ({
-            osName: os.userOs || 'Unknown',
-            totalClicks: os._count.userOs,
-
-        }));
-
-        const deviceStats = deviceType.map(device => ({
-            deviceName: device.userDevice || 'Unknown',
-            totalClicks: device._count.userDevice,
-        }));
-
-        // Fetch unique clicks across all IPs
-        const uniqueClicks = await prisma.clicks.groupBy({
-            by: ['userIp'],
-            _count: {
+        // Fetch all clicks data in one go
+        const clicksData = await prisma.clicks.findMany({
+            select: {
+                timestamp: true,
+                userOs: true,
+                userDevice: true,
                 userIp: true,
+                urlShortenerId: true,
             },
-        }).then(result => result.length);
+        });
 
-        // Final response data
+
+        interface ClickCount {
+            totalClicks: number;
+            uniqueClicks: Set<string> ;
+        }
+        const osStats: Record<string, ClickCount> = {};
+        const deviceStats: Record<string, ClickCount> = {};
+        const clickByDate: Record<string, number> = {};
+
+      
+
+        const today = new Date();
+        const sevenDaysAgo = subDays(today, 7);
+
+        clicksData.forEach(({ timestamp, userOs, userDevice,urlShortenerId }) => {
+            // Group OS stats
+            const osName = userOs || 'Unknown';
+            osStats[osName] = osStats[osName] || {
+                totalClicks: 0,
+                uniqueClicks: new Set(),
+            }
+            osStats[osName].totalClicks++;
+            osStats[osName].uniqueClicks.add(`${userOs}-${urlShortenerId.toString()}`);
+           
+
+            // Group device stats
+            const deviceName = userDevice || 'Unknown';
+            deviceStats[deviceName] = deviceStats[deviceName] || {
+                totalClicks: 0,
+                uniqueClicks: new Set(),
+            }
+            deviceStats[deviceName].totalClicks++;
+            deviceStats[deviceName].uniqueClicks.add(`${userDevice}-${urlShortenerId.toString()}`);
+
+
+            // Group clicks for last 7 days
+            if (isWithinInterval(timestamp, { start: sevenDaysAgo, end: today })) {
+                const formattedDate = format(timestamp, 'yyyy-MM-dd');
+                clickByDate[formattedDate] = (clickByDate[formattedDate] || 0) + 1;
+            }
+        });
+      
+
+        // Transform results into desired format
+        const osType = Object.entries(osStats).map(([osName, totalClicks]) => ({ 
+            osName, 
+            totalClicks: totalClicks.totalClicks,
+            uniqueClicks: totalClicks.uniqueClicks.size,
+        }));
+        const deviceType = Object.entries(deviceStats).map(([deviceName, totalClicks]) => ({
+            deviceName,
+            totalClicks: totalClicks.totalClicks,
+            uniqueClicks: totalClicks.uniqueClicks.size,
+         }));
+        const clickByDate_ = Object.entries(clickByDate).map(([date, totalClicks]) => ({ date, totalClicks }));
+
+        // Final response
         const responseData: OverallAnalytics = {
             totalUrls,
-            totalClicks: totalClicks || 0,
+            totalClicks,
             uniqueClicks,
-            osType: osStats,
-            deviceType: deviceStats,
-            clickByDate: Object.entries(clickByDate.reduce((acc: {
-                [date: string]: number;
-            }, click) => {
-                const date = new Date(click.timestamp).toISOString().slice(0, 10);
-                if (!acc[date]) {
-                    acc[date] = 0;
-                }
-                acc[date] += click._count.id;
-
-                return acc;
-            }, {})).map(([date, totalClicks]) => ({ date, totalClicks }))
+            osType,
+            deviceType,
+            clickByDate: clickByDate_,
         };
-
 
         response.status(200).json(responseData);
     } catch (error) {

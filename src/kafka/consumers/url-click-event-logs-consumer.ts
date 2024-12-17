@@ -20,7 +20,7 @@ export default async function urlClickEventLogsConsumer() {
 
         await consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
-               
+
                 if (!message.value) {
                     console.error('Received message with null value');
                     return;
@@ -32,6 +32,14 @@ export default async function urlClickEventLogsConsumer() {
                 let attempt = 0;
                 while (attempt < MAX_RETRIES) {
                     try {
+
+                        const uniqueClicks = await prisma.clicks.findFirst({
+                            where: {
+                                userIp: logs.ip,
+                                urlShortenerId: logs.urlShortenerId,
+                            },
+                        })
+
                         await prisma.clicks.create({
                             data: {
                                 userIp: logs.ip,
@@ -46,6 +54,13 @@ export default async function urlClickEventLogsConsumer() {
                         });
 
 
+
+                        if (uniqueClicks) {
+                            console.log('Unique click not detected');
+                        } else {
+                            console.log('Unique click detected');
+                        }
+
                         await prisma.urlShortener.update({
                             where: {
                                 id: logs.urlShortenerId,
@@ -55,6 +70,9 @@ export default async function urlClickEventLogsConsumer() {
                                 clicksCount: {
                                     increment: 1,
                                 },
+                                uniqueClicksCount: {
+                                    increment: uniqueClicks ? 0 : 1
+                                }
                             },
                         });
 
