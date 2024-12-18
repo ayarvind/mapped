@@ -30,3 +30,14 @@ export interface OverallAnalytics {
     osType: OSTypeResponse[];
     deviceType: DeviceTypeResponse[];
 }
+
+export interface URLAnalytics {
+    totalClicks: number;
+    clickByDate: {
+        date: string;
+        totalClicks: number;
+    }[]
+    uniqueClicks: number;
+    osType: OSTypeResponse[];
+    deviceType: DeviceTypeResponse[];
+}
