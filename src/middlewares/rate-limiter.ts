@@ -5,7 +5,7 @@ import redisClient from '../config/redis';
 async function rateLimiter(request: Request, response: Response<ServerResponse>, next: NextFunction) {
     const ipAddress = request.headers['x-forwarded-for'] || request.ip;
     const key = `rate-limiter:${ipAddress}`;
-    const limit = parseInt(process.env.RATE_LIMITS || '10', 10); 
+    const limit = parseInt(process.env.RATE_LIMITS || '10', 10);
     const ttl = 60; //  in seconds
 
     try {
@@ -27,11 +27,14 @@ async function rateLimiter(request: Request, response: Response<ServerResponse>,
 
         console.log(`IP: ${ipAddress}, Count: ${currentCount}`);
         next();
-    } catch (error: any) {
-        console.error("Rate Limiter Error:", error.message);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error('Error in rate limiter:', error.message);
+            console.error('Stack trace:', error.stack);
+        }
         response.status(500).send({
-            status: "error",
-            message: "Internal Server Error"
+            status: 'error',
+            message: 'Internal Server Error',
         });
     }
 }

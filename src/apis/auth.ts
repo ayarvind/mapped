@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../config/prisma";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import { AuthResponse } from "@/interfaces/auth";
 
 const authSchema = z.object({
@@ -51,10 +51,10 @@ export async function authHandler(req: Request, res: Response<AuthResponse>): Pr
                 name: user.name,
             },
         });
-    } catch (error: any) {
+    } catch (error : unknown) {
         console.error("Error in authHandler:", error);
-        if (error.name === "ZodError") {
-            res.status(400).json({ message: "Validation error", details: error.errors });
+        if (error instanceof ZodError) {
+            res.status(400).json({ message: "Validation error" });
         } else {
             res.status(500).json({ message: "Internal server error" });
         }

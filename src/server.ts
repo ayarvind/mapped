@@ -38,9 +38,9 @@ app.get('/health', async (_, res) => {
         const admin = kafka.admin();
         await admin.connect();
         try {
-            await admin.listTopics(); 
+            await admin.listTopics();
         } finally {
-            await admin.disconnect(); 
+            await admin.disconnect();
         }
 
         // If all checks pass
@@ -48,8 +48,10 @@ app.get('/health', async (_, res) => {
             status: 'UP',
             message: 'All services are running'
         });
-    } catch (err: any) {
-        console.error('Healthcheck error:', err.message);
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            console.log('Error in health check');
+        }
         res.status(500).json({
             status: 'DOWN',
             message: 'One or more services are down'

@@ -2,7 +2,7 @@ export default interface ServerResponse {
     status: string;
     message?: string;
     error?: string;
-    data?: any;
+    data?: unknown;
 }
 
 export interface OSTypeResponse {

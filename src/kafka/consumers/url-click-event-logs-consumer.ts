@@ -19,7 +19,7 @@ export default async function urlClickEventLogsConsumer() {
         await consumer.subscribe({ topic: 'url-click-event-logs' });
 
         await consumer.run({
-            eachMessage: async ({ topic, partition, message }) => {
+            eachMessage: async ({  message }) => {
 
                 if (!message.value) {
                     console.error('Received message with null value');

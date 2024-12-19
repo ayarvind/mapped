@@ -42,7 +42,7 @@ async function newShortner(request: Request, response: Response<ServerResponse>)
 
         // Check for custom alias conflicts if customAlias is provided
         if (customAlias) {
-            let alias = await checkIfCustomAliasExists(customAlias);
+            const alias = await checkIfCustomAliasExists(customAlias);
             if (alias) {
                 response.status(400).json({
                     status: "error",

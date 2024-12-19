@@ -5,7 +5,8 @@ async function getIpInfo(ip: string): Promise<IPInfo> {
         const response = await fetch(`http://ip-api.com/json/${ip}`);
         const info: IPInfo = await response.json();
         return info;
-    } catch (err) {
+    } catch (error:unknown) {
+        console.error(error);
         return {
             ip,
             status: "failed",
@@ -22,3 +23,5 @@ async function getIpInfo(ip: string): Promise<IPInfo> {
         }
     }
 }
+
+export default getIpInfo
