@@ -13,6 +13,7 @@ if (!brokers) {
 const url = brokers.split(',');
 const kafka = new Kafka({
     clientId: 'mapped',
+    connectionTimeout:5000,
     brokers: url
 });
 

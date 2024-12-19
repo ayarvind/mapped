@@ -36,9 +36,9 @@ app.get('/health', async (_, res) => {
         const admin = kafka.admin();
         await admin.connect();
         try {
-            await admin.listTopics(); // Assuming listing topics is sufficient for healthcheck
+            await admin.listTopics(); 
         } finally {
-            await admin.disconnect(); // Ensure cleanup
+            await admin.disconnect(); 
         }
 
         // If all checks pass

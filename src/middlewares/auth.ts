@@ -6,7 +6,7 @@ import { pathToRegexp } from 'path-to-regexp';
 export default function auth(req: Request, res: Response, next: NextFunction) {
     // Define exact unprotected routes
     const unprotectedRoutes: string[] = [
-        '/api/v1/health',
+        '/health',
         '/',
         '/api/v1/auth',
     ];
@@ -38,7 +38,7 @@ export default function auth(req: Request, res: Response, next: NextFunction) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         req.body.user = decoded as AuthUser; // Attach decoded user to request body
-        next(); // Proceed to the next middleware/route handler
+        next(); 
     } catch (error) {
         console.error('JWT verification error:', error);
         res.status(400).json({ message: 'Invalid token' });
