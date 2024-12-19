@@ -9,6 +9,7 @@ import { createTopics } from './kafka/admin';
 import urlClickEventLogsConsumer from './kafka/consumers/url-click-event-logs-consumer';
 import redisClient from './config/redis';
 import kafka from './config/kafka-client';
+import rateLimiter from './middlewares/rate-limiter';
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -18,6 +19,7 @@ app.use(cors({
 }));
 
 app.use(helmet());
+app.use(rateLimiter)
 app.use(auth);
 app.use('/api/v1', router);
 app.get('/health', async (_, res) => {
