@@ -13,10 +13,12 @@ services:
       retries: 5
       start_period: 30s
     environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_LISTENERS: PLAINTEXT://:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    env_file:
+      - .env
     networks:
       - backend
 
@@ -29,6 +31,8 @@ services:
       test: ["CMD", "nc", "-z", "localhost", "2181"]
       interval: 10s
       retries: 5
+    env_file:
+      - .env
     networks:
       - backend
 
@@ -42,35 +46,32 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    env_file:
+      - .env
     networks:
       - backend
 
-  # backend:
-  #   build: .
-  #   container_name: backend
+  backend:
+    build: .
+    container_name: backend
+    restart: always
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - kafka
+      - redis
+    env_file:
+      - .env
+    networks:
+      - backend
     
-  #   ports:
-  #     - "5000:5000"
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #   depends_on:
-  #     kafka:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - REDIS_HOST=redis
-  #     - REDIS_PORT=6379
-  #     - KAFKA_BROKERS=kafka:9092
-  #     - DATABASE_URL=postgresql://postgres.bgrodwiztuiiunblpdbu:L3z1PS9Z3wCpAjkt@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
-
-  #   networks:
-  #     - backend
+    entrypoint: >
+      npm run start 
 
 networks:
   backend:
