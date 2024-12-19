@@ -3,10 +3,12 @@ import express from 'express'
 import router from './apis/api'
 import cors from 'cors';
 import helmet from 'helmet';
-import { errorHandler, notFound} from './middlewares/errorHandler';
+import { errorHandler, notFound } from './middlewares/errorHandler';
 import auth from './middlewares/auth';
 import { createTopics } from './kafka/admin';
 import urlClickEventLogsConsumer from './kafka/consumers/url-click-event-logs-consumer';
+import redisClient from './config/redis';
+import kafka from './config/kafka-client';
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -18,10 +20,40 @@ app.use(cors({
 app.use(helmet());
 app.use(auth);
 app.use('/api/v1', router);
+app.get('/health', async (_, res) => {
+    try {
+        // Check Redis readiness
+        const redisStatus = await redisClient.ping();
+        if (redisStatus !== 'PONG') {
+            res.status(500).json({
+                status: 'DOWN',
+                message: 'Redis Server is down'
+            });
+            return;
+        }
 
-app.get('/health', (_, res) => {
-    res.status(200).send('OK');
-})
+        // Check Kafka readiness
+        const admin = kafka.admin();
+        await admin.connect();
+        try {
+            await admin.listTopics(); // Assuming listing topics is sufficient for healthcheck
+        } finally {
+            await admin.disconnect(); // Ensure cleanup
+        }
+
+        // If all checks pass
+        res.status(200).json({
+            status: 'UP',
+            message: 'All services are running'
+        });
+    } catch (err: any) {
+        console.error('Healthcheck error:', err.message);
+        res.status(500).json({
+            status: 'DOWN',
+            message: 'One or more services are down'
+        });
+    }
+});
 
 
 app.use(notFound);

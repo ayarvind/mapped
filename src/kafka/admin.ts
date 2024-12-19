@@ -2,7 +2,6 @@ import kafka from '../config/kafka-client';
 
 export async function createTopics() {
     const admin = kafka.admin();
-
     console.log("Admin connecting...");
     await admin.connect();
     console.log("Admin Connection Success...");

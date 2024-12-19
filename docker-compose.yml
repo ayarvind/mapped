@@ -39,3 +39,27 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  mapped:
+    build: .
+    image: mapped:latest
+    container_name: mapped
+    ports:
+      - "5000:5000"
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+

@@ -1,14 +1,22 @@
 import { Kafka } from "kafkajs";
-const brokers  =  process.env.KAFKA_BROKERS;
-if(!brokers){
-    throw new Error('Please provide a kafka brokers in env file');
 
+// Get Kafka brokers from environment variables
+const brokers = process.env.KAFKA_BROKERS;
+
+console.log('Brokers:', brokers);
+
+if (!brokers) {
+    throw new Error('Please provide Kafka brokers in the environment variables');
 }
+
 
 const url = brokers.split(',');
 const kafka = new Kafka({
-    clientId:'mapped',
+    clientId: 'mapped',
     brokers: url
-})
+});
+
+console.log('Kafka client initialized successfully');
+
 
 export default kafka;
