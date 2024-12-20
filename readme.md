@@ -157,7 +157,6 @@ Once the containers are running, you can access your application locally at `htt
 
 - **POST** `/shorten`: Creates a short link for a given URL.
   
- - **POST** `/links`: Creates a short link for a provided URL.
 
   **Request Body**:
   ```json
@@ -170,7 +169,7 @@ Once the containers are running, you can access your application locally at `htt
       "topic_id_2"
     ]
   }
-    ```
+ ```
 
 - **GET** `/shorten:shortUrl`: Redirects to the original URL for a given short link.
 
