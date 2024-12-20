@@ -5,3 +5,4 @@ dist
 .env
 .git
 .DS_Store
+readme.md
