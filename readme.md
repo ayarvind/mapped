@@ -85,7 +85,7 @@ Before getting started, make sure you have the following installed:
 
 - **Docker Desktop**: [Install Docker Desktop](https://www.docker.com/products/docker-desktop)
   - This will allow you to run containers for the app and related services (such as Redis, Kafka, etc.).
-- **Node.js**: [Install Node.js](https://nodejs.org/) (if you plan to run the application locally outside Docker)
+
 - **Git**: [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - **OpenSSL**: [Install OpenSSL](https://www.openssl.org/source/)
 
