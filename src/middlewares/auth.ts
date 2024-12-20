@@ -8,18 +8,18 @@ export default function auth(req: Request, res: Response, next: NextFunction) {
     const unprotectedRoutes: string[] = [
         '/health',
         '/',
-        '/api/v1/auth',
+        '/auth',
     ];
 
-    const protectedParamRoutes: string[] = [
-        '/api/v1/shorten/:shortUrl',
+    const unProtectedParamRoutes: string[] = [
+        '/shorten/:shortUrl',
     ];
 
     if (unprotectedRoutes.includes(req.path)) {
         return next();
     }
 
-    const isProtectedParamRoute = protectedParamRoutes.some((routePattern) => {
+    const isProtectedParamRoute = unProtectedParamRoutes.some((routePattern) => {
         const regex = pathToRegexp(routePattern);
         return regex.regexp.test(req.path);
     });

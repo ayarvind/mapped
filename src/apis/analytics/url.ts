@@ -81,6 +81,7 @@ async function urlAnalytics(request: Request, response: Response<URLAnalytics | 
     response.status(200).json({
       totalClicks,
       uniqueClicks,
+      lastAccessed: exist.lastAccessed?.toString(),
       clickByDate: sevenDaysClicksResponse,
       osType: osTypeResponse,
       deviceType: deviceTypeResponse,

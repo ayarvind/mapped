@@ -78,11 +78,17 @@ async function newShortner(request: Request, response: Response<ServerResponse>)
                 },
             });
         }
-
+        const completeUrl = `${request.host}/shorten/${updatedShortner.shortUrl}`;
         response.status(201).json({
             status: "success",
             message: "Short URL created successfully.",
-            data: updatedShortner,
+            data: {
+                shortUrl:completeUrl,
+                longUrl: updatedShortner.longUrl,
+                expiration: updatedShortner.expiration,
+                createdAt: updatedShortner.createdAt,
+                updatedAt: updatedShortner.updatedAt,
+            }
         });
     } catch (error) {
         if (error instanceof z.ZodError) {

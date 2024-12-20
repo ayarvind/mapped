@@ -33,6 +33,7 @@ export interface OverallAnalytics {
 
 export interface URLAnalytics {
     totalClicks: number;
+    lastAccessed?: string;
     clickByDate: {
         date: string;
         totalClicks: number;

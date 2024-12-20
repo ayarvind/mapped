@@ -2,6 +2,7 @@ services:
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
+    restart : always
     depends_on:
       - zookeeper
     ports:
@@ -67,6 +68,8 @@ services:
       - redis
     env_file:
       - .env
+    environment:
+      - NODE_ENV=production
     networks:
       - backend
     

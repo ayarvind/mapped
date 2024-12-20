@@ -21,7 +21,7 @@ app.use(cors({
 app.use(helmet());
 app.use(rateLimiter)
 app.use(auth);
-app.use('/api/v1', router);
+app.use('/', router);
 app.get('/health', async (_, res) => {
     try {
         // Check Redis readiness

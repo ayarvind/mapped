@@ -7,6 +7,7 @@ import newShortner from './short/new-short';
 import redirectToLonUrl from './short/redirect';
 import overall from './analytics/overall';
 import urlAnalytics from './analytics/url';
+import topicwiseAnalytics from './analytics/topic';
 
 const router = express.Router();
 
@@ -26,4 +27,5 @@ router.get('/shorten/:shortUrl', redirectToLonUrl)
 
 router.get('/analytics/overall', overall)
 router.get('/analytics/:alias', urlAnalytics)
+router.get('/analytics/topic/:topicName', topicwiseAnalytics)
 export default router;

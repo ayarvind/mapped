@@ -11,6 +11,14 @@ async function getTopics(request: Request, response: Response<ServerResponse>) {
         const topics = await prisma.topics.findMany({
             where: {
                 userId: user.id
+            },
+            select:{
+                name: true,
+                id: true,
+                createdAt: true,
+                updatedAt: true,
+
+
             }
         });
         response.status(200).json({

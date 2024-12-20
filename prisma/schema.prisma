@@ -22,7 +22,7 @@ model User {
 
 model Topics {
   id           Int            @id @default(autoincrement())
-  name         String
+  name         String         @unique
   user         User           @relation(fields: [userId], references: [id],onDelete: Cascade)
   userId       Int
   createdAt    DateTime       @default(now())

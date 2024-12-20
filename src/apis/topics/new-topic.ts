@@ -33,6 +33,13 @@ async function newTopic(request: Request, response: Response<ServerResponse>) {
         });
     } catch (error) {
         console.error("Error creating topic:", error);
+        if (error instanceof Error && error.message.includes('Unique constraint failed on the fields: (`name`)')) {
+            response.status(409).json({
+                status: 'error',
+                message: 'Topic with this name already exists.'
+            });
+            return;
+        }
         response.status(500).json({
             status: 'error',
             message: 'An error occurred while creating the topic.',
