@@ -154,22 +154,23 @@ Once the containers are running, you can access your application locally at `htt
   }
   ```
 - **GET** `/topics`: Retrieves all topics created by the user.
-
 - **POST** `/shorten`: Creates a short link for a given URL.
-  
 
-  **Request Body**:
+
+ **Request Body**:
   ```json
   {
-    "longUrl": "https://example.com",   // Long URL to shorten
-    "customAlias": "example",           // Custom alias for the short link (optional)
+    "longUrl": "https://example.com",       // Long URL to shorten
+    "customAlias": "example",               // Custom alias for the short link (optional)
     "expiration": "2024-12-31T23:59:59Z",  // Expiration date and time in ISO 8601 format (optional)
-    "topicIds": [                       // List of topic IDs to group the short link (optional)
+    "topicIds": [                           // List of topic IDs to group the short link (optional)
       "topic_id_1",
       "topic_id_2"
     ]
   }
- ```
+  ```
+
+
 
 - **GET** `/shorten:shortUrl`: Redirects to the original URL for a given short link.
 
