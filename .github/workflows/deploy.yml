@@ -13,10 +13,11 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-              node-version: [18.x, 20.x, 22.x]
+              node-version: [18.x]
 
         steps:
             - uses: actions/checkout@v4
+
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
@@ -32,10 +33,10 @@ jobs:
             - name: Run Lint
               run: npm run lint
 
-            - name: Build  the docker image
+            - name: Build the docker image
               run: |
                 docker build -t ${{ secrets.DOCKER_USERNAME }}/mapped:latest .
-            
+
             - name: Login to Docker hub
               uses: docker/login-action@v2
               with:
@@ -44,7 +45,7 @@ jobs:
 
             - name: Push docker image
               run: docker push ${{ secrets.DOCKER_USERNAME }}/mapped:latest
-    
+
             - name: SSH into EC2 and Deploy
               uses: appleboy/ssh-action@v0.1.2
               with:
@@ -52,12 +53,12 @@ jobs:
                 username: ubuntu
                 key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
                 port: 22
-                script: |   
-                   cd /home/ubuntu/mapped
-                    git pull origin main  
-                    docker-compose pull   
-                    docker-compose down    
+                script: |
+                    cd /home/ubuntu/mapped
+                    git pull origin main
+                    docker-compose pull
+                    docker-compose down
                     docker-compose up --build -d
-    
+
             - name: Check if the service is running
-              run: curl -f ${{ secrets.EC2_IP }}:5000/health
+              run: curl -f ${{ secrets.EC2_IP }}/health
