@@ -2,6 +2,7 @@ services:
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
+
     restart : always
     depends_on:
       - zookeeper
@@ -18,8 +19,10 @@ services:
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - KAFKA_LISTENERS=PLAINTEXT://:9092
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_HEAP_OPTS=-Xms256M -Xmx512M
     env_file:
       - .env
+    mem_limit: 512m
     networks:
       - backend
 
