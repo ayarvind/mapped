@@ -51,16 +51,18 @@ jobs:
                 mkdir -p ~/.ssh
                 echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
                 chmod 600 ~/.ssh/id_rsa
+                echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+            
 
-            - name: Loginto EC2
+            - name: Login to EC2 and Deploy
               run: |
-                ssh  -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_IP }}
-                cd /home/ubuntu/mapped
-                cd /home/ubuntu/mapped
-                git pull origin main
-                docker-compose pull
-                docker-compose down
-                docker-compose up --build -d
+                ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_IP }} <<EOF
+                  cd /home/ubuntu/mapped
+                  git pull origin main
+                  docker-compose pull
+                  docker-compose down
+                  docker-compose up --build -d
+                EOF
 
               
           
