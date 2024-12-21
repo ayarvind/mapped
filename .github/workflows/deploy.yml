@@ -9,7 +9,7 @@ on:
             - main
 
 jobs:
-    build:
+    deploy:
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -44,6 +44,18 @@ jobs:
 
             - name: Push docker image
               run: docker push ${{ secrets.DOCKER_USERNAME }}/mapped:latest
-              
-
-
+    
+            - name: SSH into EC2 and Deploy
+              uses: appleboy/ssh-action@v0.1.2
+              with:
+                host: ${{ secrets.EC2_IP }}
+                username: ubuntu
+                key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+                port: 22
+                script: |   
+                   cd /home/ubuntu/mapped
+                    git pull origin main  
+                    docker-compose pull   
+                    docker-compose down    
+                    docker-compose up --build -d
+    
