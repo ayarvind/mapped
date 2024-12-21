@@ -46,28 +46,23 @@ jobs:
             - name: Push docker image
               run: docker push ${{ secrets.DOCKER_USERNAME }}/mapped:latest
 
-            - name: SSH into EC2 and Deploy
+            - name: Configure SSH
               run: |
-                ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ubuntu@${{ secrets.EC2_IP }} << 'ENDSSH'
+                mkdir -p ~/.ssh
+                echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+                chmod 600 ~/.ssh/id_rsa
+
+            - name: Loginto EC2
+              run: |
+                ssh  -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_IP }}
+                cd /home/ubuntu/mapped
                 cd /home/ubuntu/mapped
                 git pull origin main
                 docker-compose pull
                 docker-compose down
                 docker-compose up --build -d
-                ENDSSH
 
-              # uses: appleboy/ssh-action@v0.1.2
-              # with:
-              #   host: ${{ secrets.EC2_IP }}
-              #   username: ubuntu
-              #   key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-              #   port: 22
-              #   script: |
-              #       cd /home/ubuntu/mapped
-              #       git pull origin main
-              #       docker-compose pull
-              #       docker-compose down
-              #       docker-compose up --build -d
-
+              
+          
             - name: Check if the service is running
               run: curl -f ${{ secrets.EC2_IP }}/health

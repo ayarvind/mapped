@@ -6,3 +6,4 @@ dist
 .git
 .DS_Store
 readme.md
+.github
