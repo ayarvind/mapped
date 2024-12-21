@@ -59,3 +59,5 @@ jobs:
                     docker-compose down    
                     docker-compose up --build -d
     
+            - name: Check if the service is running
+              run: curl -f ${{ secrets.EC2_IP }}:5000/health
