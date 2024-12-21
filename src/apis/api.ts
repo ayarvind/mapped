@@ -8,15 +8,17 @@ import redirectToLonUrl from './short/redirect';
 import overall from './analytics/overall';
 import urlAnalytics from './analytics/url';
 import topicwiseAnalytics from './analytics/topic';
+import doc from './doc';
 
 const router = express.Router();
-
+router.get('/',doc)
 router.get('/health', health);
 router.post('/auth',authHandler)
 
 //topics
 router.post('/topics',newTopic)
 router.get('/topics',getTopics)
+
 
 // shortner
 
