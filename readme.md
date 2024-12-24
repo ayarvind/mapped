@@ -179,6 +179,8 @@ Once the containers are running, you can access your application locally at `htt
 
 - **GET** `/analytics/:topicName`: Retrieves analytics data for a specific topic.
 
+## For each endpoint except /auth and /shorten, shortUrl accepts the x-auth-token as the header parameter for authentication. This token is the same that was generated at login.
+
   
 
 
